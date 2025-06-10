@@ -59,13 +59,13 @@ README.md
 ### Requirements
 
 - Python ≥ 3.9
-- Raspberry Pi (or PC with USB camera)
+- ESP32-CAM
 - Google Sheets API with Apps Script Webhook
 
 ### Install Dependencies
 
 ```bash
-pip install opencv-python face_recognition requests gpiozero
+pip install -r requirement.txt
 ```
 
 ---
@@ -73,7 +73,7 @@ pip install opencv-python face_recognition requests gpiozero
 ## 🚀 Run the System
 
 ```bash
-python main.py
+python face_recognite.py
 ```
 
 The script will:
