@@ -1,27 +1,32 @@
-
+````markdown
 # 🚌 Smart Student Boarding Monitoring System
 
-> Automated tracking of student boarding and alighting using ultrasonic sensors, facial recognition, and real-time web reporting.
+> Real-time system for monitoring student boarding using face recognition, live camera, and a web dashboard.
 
 ---
 
 ## 🎯 Project Objective
 
-This system is designed to **safely and automatically monitor students boarding or alighting school buses**, using **ultrasonic sensors** and **facial recognition**. Detected events are **sent to a Google Looker Studio dashboard** for live monitoring by school administrators and parents.
+This system allows **automatic and real-time monitoring of student boarding and alighting** using a camera (e.g. ESP32-CAM or USB webcam) and facial recognition. It features a **live web dashboard** for:
+
+- ✅ Student check-in tracking
+- ✅ Time logging
+- ✅ Attendance summary chart
+- ✅ Entry/exit history
+- ✅ Real-time map of school bus
 
 ---
 
 ## ⚙️ Technologies Used
 
-| Component                | Description                                                                 |
-|--------------------------|-----------------------------------------------------------------------------|
-| 👁️ Facial Recognition     | Uses OpenCV and `face_recognition` library to identify students.            |
-| 📏 Ultrasonic Sensor       | Detects motion at the bus door to trigger the camera.                      |
-| 🧠 Event Detection Logic   | Combines sensor and facial input to determine boarding/alighting events.    |
-| 🌐 Google Sheets API       | Pushes event data to Google Sheets.                                        |
-| 📊 Looker Studio Dashboard | Visualizes student movement data in real-time.                             |
-
-🔗 **Live Dashboard**: [View Looker Studio Report](https://lookerstudio.google.com/u/0/reporting/ba741c53-7906-4647-ae34-47411da66bcb/page/page_12345)
+| Component             | Description                                                                 |
+|-----------------------|-----------------------------------------------------------------------------|
+| 👁️ Facial Recognition  | Uses `face_recognition` and OpenCV to identify students from saved images. |
+| 📷 Camera Feed         | Captures video stream (supports IP cameras or local USB webcams).           |
+| 🌐 Flask Web Server    | Serves a local dashboard accessible via LAN.                                |
+| 📊 Chart.js            | Displays attendance summary in a pie chart.                                 |
+| 🗺️ Leaflet.js + OSM    | Shows current location of the school bus (static for demo).                 |
+| 🧾 Attendance History  | Logs all student check-in events with timestamps.                           |
 
 ---
 
@@ -29,95 +34,149 @@ This system is designed to **safely and automatically monitor students boarding 
 
 ```mermaid
 graph LR
-A[Ultrasonic Sensor Triggered] --> B[Capture Image via Camera]
-B --> C[Run Face Recognition]
-C --> D{Is Face Matched?}
-D -- Yes --> E[Log Student ID & Timestamp]
-E --> F[Send Data to Google Sheet]
-F --> G[Display on Looker Studio Dashboard]
-```
+A[Camera Captures Image] --> B[Run Face Recognition]
+B --> C{Face Matched?}
+C -- Yes --> D[Log Time + Name]
+D --> E[Update Attendance List]
+E --> F[Display on Web Dashboard]
+````
 
 ---
 
-## 📁 Project Structure
+## 📂 Project Structure
 
 ```
-/face_recognition/     # Face encoding and recognition logic
-/ultrasonic_sensor/    # HC-SR04 detection script
-/web_sender/           # Script to send data to Google Sheet API
-/models/               # Encoded student facial data
-/images/               # Captured images at events
-config.py              # Google Sheet config, thresholds, constants
-main.py                # Integrated system controller
-README.md
+smart-attendance/
+├── app.py                # Main Flask server (Python)
+├── templates/
+│   └── index.html        # Dashboard UI (camera, chart, map, list)
+├── image_folder/         # Face images of students
+├── requirements.txt      # Python dependencies
+└── README.md             # You’re here
 ```
 
 ---
 
 ## 🔧 Setup Instructions
 
-### Requirements
+### ✅ Requirements
 
-- Python ≥ 3.9
-- ESP32-CAM
-- Google Sheets API with Apps Script Webhook
+* Python 3.9+
+* Linux (tested on Arch Linux), Windows, or macOS
+* IP camera or webcam
+* Dependencies in `requirements.txt`
 
-### Install Dependencies
+### ✅ Installation
 
 ```bash
-pip install -r requirement.txt
+# (Optional) Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Or 'venv\Scripts\activate' on Windows
+
+# Install Python packages
+pip install -r requirements.txt
+```
+
+> ⚠️ On Arch Linux, use system packages if needed:
+
+```bash
+sudo pacman -S python-opencv dlib cmake
 ```
 
 ---
 
 ## 🚀 Run the System
 
+### 🧠 Start Flask Web Server
+
 ```bash
-python face_recognite.py
+python app.py
 ```
 
-The script will:
-- Detect students via ultrasonic sensor.
-- Capture photo and identify student using face recognition.
-- If matched, log the event and send data to Google Sheets.
-- Data will automatically appear on Looker Studio dashboard.
+It will start at:
+
+```
+http://0.0.0.0:5000
+```
 
 ---
 
-## 📤 Data Sent to Web
+## 📱 Access from Your Phone (Same Wi-Fi)
 
-| Field        | Description                      |
-|--------------|----------------------------------|
-| `student_id` | Unique ID of the student         |
-| `name`       | Full name of the student         |
-| `event`      | `BOARD` or `ALIGHT`              |
-| `time`       | Timestamp of the event           |
-| `image_url`  | Optional link to the captured image |
+1. Get your local IP:
+
+```bash
+ip a
+```
+
+Find something like `192.168.x.x`
+
+2. On your phone, open browser and go to:
+
+```
+http://<your-ip>:5000
+```
+
+**Example:**
+
+```
+http://192.168.1.10:5000
+```
+
+> ✅ Make sure your phone is on the same Wi-Fi network.
 
 ---
 
-## 📊 Dashboard Preview
+## 🌐 Web Dashboard Features
 
-![Dashboard Screenshot Placeholder](https://lookerstudio.google.com/public_image_placeholder.jpg)  
-> Replace this with a real dashboard screenshot for better visuals.
+* 🎥 Live camera feed from your bus or device
+* 📊 Doughnut chart of attendance status
+* 📋 Live student check-in list
+* 🕒 History of entries with time
+* 🗺️ School bus map (currently fixed to Hanoi University of Science and Technology)
+
+---
+
+## 📤 Data Logged
+
+| Field       | Description                |
+| ----------- | -------------------------- |
+| `name`      | Student’s name             |
+| `time`      | Check-in time (HH\:MM\:SS) |
+| `history[]` | Full list of entry events  |
+
+---
+
+## 📸 Screenshot Placeholder
+
+> Replace this with real UI screenshot when available
+
+![UI Example](https://i.pinimg.com/736x/ef/9d/49/ef9d4976e27a723afb52bb39f471fb7b.jpg)
 
 ---
 
 ## 🛠 Future Improvements
 
-- Add RFID/NFC as secondary identity verification
-- Alerts for anomalies (e.g. student not dropped off)
-- Separate dashboards for parents and school administrators
-- Exportable reports and trip summaries
+* ✅ Add GPS integration for real-time bus tracking
+* ✅ Separate views for parents and school admins
+* ✅ Add email/SMS alerts for late/no-shows
+* ✅ Integrate with RFID/NFC check-in
 
 ---
 
 ## 📄 License
 
-This project is licensed under the [MIT License](./LICENSE).
+This project is open-sourced under the [MIT License](./LICENSE).
 
 ---
 
 ## 🤝 Contributions
 
-We welcome all contributions! Please feel free to fork the repo, submit pull requests, or open issues for improvements.
+Contributions are welcome!
+
+* Fork this repository
+* Submit pull requests
+* Report issues or suggest features
+
+```
+
