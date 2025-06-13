@@ -1,4 +1,3 @@
-````markdown
 # 🚌 Smart Student Boarding Monitoring System
 
 > Real-time system for monitoring student boarding using face recognition, live camera, and a web dashboard.
@@ -177,6 +176,4 @@ Contributions are welcome!
 * Fork this repository
 * Submit pull requests
 * Report issues or suggest features
-
-```
 
