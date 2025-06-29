@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Attendance System</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: sans-serif;
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1, h2 {
+      text-align: center;
+    }
+
+    /* === Camera + Chart side by side === */
+    #top-section {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    #video-container, #chart-container {
+      flex: 1 1 48%;
+    }
+
+    #video-container img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    #chart-container {
+      height: 300px;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+
+    /* === Map and Attendance List === */
+    #map {
+      height: 300px;
+      width: 100%;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    ul#attendance-list {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    ul#attendance-list li {
+      background-color: #f0f0f0;
+      margin-bottom: 5px;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+
+    ul#history-list {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 10px;
+    }
+
+    ul#history-list li {
+      font-size: 0.95em;
+      padding: 6px 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    @media (max-width: 768px) {
+      #top-section {
+        flex-direction: column;
+      }
+    }
+  </style>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Leaflet.js -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+</head>
+
+<body>
+  <h1>🚍 Student Attendance System</h1>
+
+  <!-- Camera + Chart -->
+  <div id="top-section">
+    <!-- Live Camera -->
+    <div id="video-container">
+      <h2>Live Camera Feed</h2>
+      <img src="{{ url_for('video_feed') }}" alt="Live Feed">
+    </div>
+
+    <!-- Attendance Chart -->
+    <div id="chart-container">
+      <h2>📊 Attendance Summary</h2>
+      <canvas id="attendanceChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Attendance List -->
+  <h2>📋 Checked-in Students</h2>
+  <ul id="attendance-list"></ul>
+
+  <!-- History -->
+  <h2>🗺️ Current Location of Bus</h2>
+  <ul id="history-list"></ul>
+
+  <!-- Map -->
+  <div id="map"></div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const TOTAL_STUDENTS = 40;
+
+      // Chart setup
+      const ctx = document.getElementById('attendanceChart').getContext('2d');
+      const attendanceChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Checked In', 'Not Yet Arrived'],
+          datasets: [{
+            data: [0, TOTAL_STUDENTS],
+            backgroundColor: ['#36A2EB', '#FF6384']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          }
+        }
+      });
+
+      // Fetch attendance
+      async function fetchAttendance() {
+        try {
+          const res = await fetch('/attendance');
+          const data = await res.json();
+          const list = document.getElementById('attendance-list');
+          list.innerHTML = '';
+
+          const names = Object.keys(data);
+          names.forEach(name => {
+            const li = document.createElement('li');
+            li.textContent = `${name} - ${data[name]}`;
+            list.appendChild(li);
+          });
+
+          attendanceChart.data.datasets[0].data = [
+            names.length,
+            TOTAL_STUDENTS - names.length
+          ];
+          attendanceChart.update();
+        } catch (err) {
+          console.error('Attendance fetch error:', err);
+        }
+      }
+
+      // Fetch history
+      async function fetchHistory() {
+        try {
+          const res = await fetch('/history');
+          const data = await res.json();
+          const list = document.getElementById('history-list');
+          list.innerHTML = '';
+
+          data.slice().reverse().forEach(entry => {
+            const li = document.createElement('li');
+            li.textContent = `${entry.name} - ${entry.time}`;
+            list.appendChild(li);
+          });
+        } catch (err) {
+          console.error('History fetch error:', err);
+        }
+      }
+
+      // Fetch location (map)
+      const HUST_LAT = 21.005144;
+      const HUST_LNG = 105.843410;
+
+      const map = L.map('map').setView([HUST_LAT, HUST_LNG], 16);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      const marker = L.marker([HUST_LAT, HUST_LNG])
+        .addTo(map)
+        .bindPopup('School Bus Location');
+
+      async function updateMap() {
+        try {
+          const res = await fetch('/location');
+          const loc = await res.json();
+          marker.setLatLng([loc.lat, loc.lng]);
+          map.setView([loc.lat, loc.lng], 16);
+        } catch (err) {
+          console.error('Map update error:', err);
+        }
+      }
+
+      // Run periodically
+      fetchAttendance();
+      fetchHistory();
+      updateMap();
+
+      setInterval(fetchAttendance, 3000);
+      setInterval(fetchHistory, 5000);
+      setInterval(updateMap, 5000);
+    });
+  </script>
+</body>
+</html>
