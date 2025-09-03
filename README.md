@@ -1,35 +1,29 @@
-# 🚌 Smart Student Boarding Monitoring System
-
-> Real-time system for monitoring student boarding using face recognition, live camera, and a web dashboard.
-
----
-
-## 🎯 Project Objective
+## Project Objective
 
 This system allows **automatic and real-time monitoring of student boarding and alighting** using a camera (e.g. ESP32-CAM or USB webcam) and facial recognition. It features a **live web dashboard** for:
 
-- ✅ Student check-in tracking
-- ✅ Time logging
-- ✅ Attendance summary chart
-- ✅ Entry/exit history
-- ✅ Real-time map of school bus
+- Student check-in tracking
+- Time logging
+- Attendance summary chart
+- Entry/exit history
+- Real-time map of school bus
 
 ---
 
-## ⚙️ Technologies Used
+## Technologies Used
 
 | Component             | Description                                                                 |
 |-----------------------|-----------------------------------------------------------------------------|
-| 👁️ Facial Recognition  | Uses `face_recognition` and OpenCV to identify students from saved images. |
-| 📷 Camera Feed         | Captures video stream (supports IP cameras or local USB webcams).           |
-| 🌐 Flask Web Server    | Serves a local dashboard accessible via LAN.                                |
-| 📊 Chart.js            | Displays attendance summary in a pie chart.                                 |
-| 🗺️ Leaflet.js + OSM    | Shows current location of the school bus (static for demo).                 |
-| 🧾 Attendance History  | Logs all student check-in events with timestamps.                           |
+| Facial Recognition  | Uses `face_recognition` and OpenCV to identify students from saved images. |
+| Camera Feed         | Captures video stream (supports IP cameras or local USB webcams).           |
+| Flask Web Server    | Serves a local dashboard accessible via LAN.                                |
+| Chart.js            | Displays attendance summary in a pie chart.                                 |
+| Leaflet.js + OSM    | Shows current location of the school bus (static for demo).                 |
+| Attendance History  | Logs all student check-in events with timestamps.                           |
 
 ---
 
-## 🧩 System Workflow
+## System Workflow
 
 ```mermaid
 graph LR
@@ -42,7 +36,7 @@ E --> F[Display on Web Dashboard]
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 smart-attendance/
@@ -56,16 +50,16 @@ smart-attendance/
 
 ---
 
-## 🔧 Setup Instructions
+## Setup Instructions
 
-### ✅ Requirements
+### Requirements
 
 * Python 3.9+
 * Linux (tested on Arch Linux), Windows, or macOS
 * IP camera or webcam
 * Dependencies in `requirements.txt`
 
-### ✅ Installation
+### Installation
 
 ```bash
 # (Optional) Create virtual environment
@@ -76,7 +70,7 @@ source venv/bin/activate  # Or 'venv\Scripts\activate' on Windows
 pip install -r requirements.txt
 ```
 
-> ⚠️ On Arch Linux, use system packages if needed:
+> On Arch Linux, use system packages if needed:
 
 ```bash
 sudo pacman -S python-opencv dlib cmake
@@ -84,9 +78,9 @@ sudo pacman -S python-opencv dlib cmake
 
 ---
 
-## 🚀 Run the System
+## Run the System
 
-### 🧠 Start Flask Web Server
+### Start Flask Web Server
 
 ```bash
 python app.py
@@ -100,7 +94,7 @@ http://0.0.0.0:5000
 
 ---
 
-## 📱 Access from Your Phone (Same Wi-Fi)
+## Access from Your Phone (Same Wi-Fi)
 
 1. Get your local IP:
 
@@ -122,21 +116,21 @@ http://<your-ip>:5000
 http://192.168.1.10:5000
 ```
 
-> ✅ Make sure your phone is on the same Wi-Fi network.
+> Make sure your phone is on the same Wi-Fi network.
 
 ---
 
-## 🌐 Web Dashboard Features
+## Web Dashboard Features
 
-* 🎥 Live camera feed from your bus or device
-* 📊 Doughnut chart of attendance status
-* 📋 Live student check-in list
-* 🕒 History of entries with time
-* 🗺️ School bus map (currently fixed to Hanoi University of Science and Technology)
+* Live camera feed from your bus or device
+* Doughnut chart of attendance status
+* Live student check-in list
+* History of entries with time
+* School bus map (currently fixed to Hanoi University of Science and Technology)
 
 ---
 
-## 📤 Data Logged
+## Data Logged
 
 | Field       | Description                |
 | ----------- | -------------------------- |
@@ -146,7 +140,7 @@ http://192.168.1.10:5000
 
 ---
 
-## 📸 Screenshot Placeholder
+## Screenshot Placeholder
 
 > Replace this with real UI screenshot when available
 
@@ -154,26 +148,10 @@ http://192.168.1.10:5000
 
 ---
 
-## 🛠 Future Improvements
 
-* ✅ Add GPS integration for real-time bus tracking
-* ✅ Separate views for parents and school admins
-* ✅ Add email/SMS alerts for late/no-shows
-* ✅ Integrate with RFID/NFC check-in
-
----
-
-## 📄 License
+## License
 
 This project is open-sourced under the [MIT License](./LICENSE).
 
 ---
-
-## 🤝 Contributions
-
-Contributions are welcome!
-
-* Fork this repository
-* Submit pull requests
-* Report issues or suggest features
 
